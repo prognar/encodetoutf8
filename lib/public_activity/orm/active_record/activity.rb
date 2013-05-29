@@ -17,6 +17,10 @@ module PublicActivity
 
         # should recipient and owner be accessible?
         attr_accessible :key, :owner, :parameters, :recipient, :trackable
+
+        has_one :micropost, foreign_key: "id", primary_key: "trackable_id"
+        has_one :relationship, foreign_key: "id",
+                               primary_key: "trackable_id"
       end
     end
   end

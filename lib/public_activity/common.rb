@@ -22,6 +22,8 @@ module PublicActivity
     extend ActiveSupport::Concern
 
     included do
+      ::PublicActivity.config # it's the first module to be loaded into models
+                              # we need to have pieces provided by orm loaded
       include Trackable
       class_attribute :activity_owner_global, :activity_recipient_global,
                       :activity_params_global, :activity_hooks, :activity_custom_fields_global
@@ -271,7 +273,9 @@ module PublicActivity
       all_options = args.extract_options!
       options = {
         key: all_options.delete(:key),
+        owner: all_options.delete(:owner),
         action: all_options.delete(:action),
+        recipient: all_options.delete(:recipient),
         parameters: all_options.delete(:parameters) || all_options.delete(:params)
       }
       action = (args.first || options[:action]).try(:to_s)
@@ -284,25 +288,22 @@ module PublicActivity
 
       # user responsible for the activity
       options[:owner] = PublicActivity.resolve_value(self,
-        (all_options.has_key?(:owner) ? all_options[:owner] : (
-          self.activity_owner || self.class.activity_owner_global
-          )
-        )
+        options[:owner] ||
+        self.activity_owner ||
+        self.class.activity_owner_global
       )
 
       # recipient of the activity
       options[:recipient] = PublicActivity.resolve_value(self,
-        (all_options.has_key?(:recipient) ? all_options[:recipient] : (
-          self.activity_recipient || self.class.activity_recipient_global
-          )
-        )
+        options[:recipient] ||
+        self.activity_recipient ||
+        self.class.activity_recipient_global
       )
 
       #customizable parameters
-      params = {}
+      params = options[:params] || options[:parameters] || {}
       params.merge!(self.class.activity_params_global)
       params.merge!(self.activity_params) if self.activity_params
-      params.merge!(options[:params] || options[:parameters] || {})
       params.each { |k, v| params[k] = PublicActivity.resolve_value(self, v) }
       options[:parameters] = params
       options.delete(:params)
