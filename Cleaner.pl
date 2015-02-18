@@ -8,8 +8,8 @@ binmode STDOUT, ":utf8";
 
 my $in_file      = "input.csv";
 my $out_file     = "output.csv";
-my %replacements = ( 
-	'\u00ED' => 'í';
+my %replacements = (
+    '\u00ED' => 'í',
 );
 
 # stream_big_files();
