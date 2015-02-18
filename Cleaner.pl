@@ -25,7 +25,7 @@ sub clean_lines {
 
     #Find and replace
     for my $k ( keys %replacements ) {
-        $line =~ s/$k/$replacements{$k}/g;
+        $line =~ s/\Q$k\E/$replacements{$k}/g;
     }
 
     return $line;
