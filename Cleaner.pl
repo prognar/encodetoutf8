@@ -8,8 +8,8 @@ binmode STDOUT, ":utf8";
 
 my $in_file      = "input.csv";
 my $out_file     = "output.csv";
-my %replacements = ( 
-	'\u00ED' => 'í';
+my %replacements = (
+    '\u00ED' => 'í',
 );
 
 # stream_big_files();
@@ -25,7 +25,7 @@ sub clean_lines {
 
     #Find and replace
     for my $k ( keys %replacements ) {
-        $line =~ s/$k/$replacements{$k}/g;
+        $line =~ s/\Q$k\E/$replacements{$k}/g;
     }
 
     return $line;
